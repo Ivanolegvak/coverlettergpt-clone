@@ -42,7 +42,8 @@
       const resume = document.getElementById("resume").value;
       const job = document.getElementById("job").value;
 
-      const response = await fetch("https://YOUR_BACKEND_URL/api/generate", {
+      const response = await fetch("https://coverlettergpt-clone-production.up.railway.app/api/generate", {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resume, job })
