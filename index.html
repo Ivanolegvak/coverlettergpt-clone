@@ -3,55 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoverLetterGPT</title>
+  <title>CoverLetterGPT – Smart AI Letters</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
-    textarea { width: 100%; height: 100px; margin-bottom: 1rem; padding: 0.75rem; border-radius: 6px; border: 1px solid #ccc; }
-    button { padding: 0.75rem 1.5rem; background-color: #0488cd; color: white; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 1rem; }
-    #response { white-space: pre-wrap; background: #f9f9f9; padding: 1rem; border-radius: 6px; border: 1px solid #eee; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #f9fbff, #edf1f5);
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: #2b2b2b;
+    }
+    .ukraine {
+      color: #0057B8;
+      font-weight: bold;
+      background-color: #FFD700;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .button, button {
+      background-color: #0488cd;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    #response {
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .pay-cta {
+      margin-top: 2rem;
+    }
+    .upload-group {
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
-  <h1>✍️ AI Cover Letter Generator</h1>
-  <p>Paste your resume and job description. Get a professional cover letter in seconds.</p>
+  <header>
+    <h1>✍️ CoverLetterGPT</h1>
+    <div class="ukraine">🇺🇦 We Stand with Ukraine</div>
+  </header>
 
-  <h3>Resume:</h3>
+  <p>Paste your resume, job description, or upload files/URLs to generate the perfect AI cover letter.</p>
+
+  <h3>Resume Text:</h3>
   <textarea id="resume"></textarea>
 
   <h3>Job Description:</h3>
   <textarea id="job"></textarea>
 
-  <button onclick="generateLetter()">Generate Cover Letter</button>
+  <h3>OR Paste a Job URL:</h3>
+  <input type="text" id="jobURL" placeholder="https://company.com/job-posting">
 
-  <div id="paywall" style="display:none;">
-    <p>You've used your 2 free letters. Please support us ❤️:</p>
-    <a href="https://secure.wayforpay.com/button/ba044d1ef050b" style="display:inline-block!important;background:#0488cd;background-size:cover;width: 256px!important;height:54px!important;border:none!important;border-radius:14px!important;padding:16px!important;text-decoration:none!important;box-shadow:3px 2px 8px rgba(71,66,66,0.22)!important;text-align:center!important;outline:none!important;" onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';"> <span style="font-family:Verdana,Arial,sans-serif!important;font-weight:bold!important;font-size:14px!important;color:#ffffff!important;line-height:18px!important;vertical-align:middle!important;">Оплатить</span></a>
+  <div class="upload-group">
+    <label><strong>Upload Resume (PDF or DOCX):</strong></label>
+    <input type="file" id="resumeFile" accept=".pdf,.docx"><br><br>
+    <label><strong>Upload Job Description (PDF or DOCX):</strong></label>
+    <input type="file" id="jobFile" accept=".pdf,.docx">
+  </div>
+
+  <br><button onclick="generateLetter()">Generate Cover Letter</button>
+
+  <div class="pay-cta">
+    <a href="https://secure.wayforpay.com/button/ba044d1ef050b" class="button">💳 Unlock Unlimited Letters for $4.99</a>
   </div>
 
   <h3>Generated Cover Letter:</h3>
-  <div id="response"></div>
+  <div id="response">Your cover letter will appear here.</div>
 
   <script>
+    async function extractFromURL(url) {
+      try {
+        const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent(url));
+        const data = await res.json();
+        return data.contents;
+      } catch (e) {
+        return 'Unable to fetch content from job URL.';
+      }
+    }
+
+    async function readFileContent(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsText(file);
+      });
+    }
+
     async function generateLetter() {
-      let count = parseInt(localStorage.getItem("coverLetterCount") || "0");
-      if (count >= 2) {
-        document.getElementById("paywall").style.display = "block";
-        return;
+      const resumeText = document.getElementById("resume").value;
+      const jobText = document.getElementById("job").value;
+      const jobURL = document.getElementById("jobURL").value;
+
+      let resume = resumeText;
+      let job = jobText;
+
+      if (jobURL) {
+        job = await extractFromURL(jobURL);
       }
 
-      const resume = document.getElementById("resume").value;
-      const job = document.getElementById("job").value;
+      const resumeFile = document.getElementById("resumeFile").files[0];
+      const jobFile = document.getElementById("jobFile").files[0];
+
+      if (resumeFile) {
+        resume += '\n' + await readFileContent(resumeFile);
+      }
+
+      if (jobFile) {
+        job += '\n' + await readFileContent(jobFile);
+      }
 
       const response = await fetch("https://coverlettergpt-clone-production.up.railway.app/api/generate", {
-
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resume, job })
       });
-      const data = await response.json();
 
+      const data = await response.json();
       document.getElementById("response").textContent = data.result;
-      localStorage.setItem("coverLetterCount", (count + 1).toString());
     }
   </script>
 </body>
