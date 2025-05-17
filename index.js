@@ -9,18 +9,7 @@ app.use(express.json());
 
 app.post("/api/generate", async (req, res) => {
   const { resume, job } = req.body;
-  const prompt = `
-Act as a world-class cover letter expert. Write a professional, compelling, and personalized cover letter that follows international standards. 
-Use the resume and job description provided. 
-Analyze keywords, company mission, and values. Show clear alignment between the candidate’s background and what the company is looking for. 
-Be specific, confident, and inspiring. Avoid clichés and keep it concise, matching tone and industry expectations.
-
-Resume:
-${resume}
-
-Job Description:
-${job}
-`;
+  const prompt = `Write a professional cover letter using this resume:\n${resume}\n\nand this job description:\n${job}`;
 
   try {
     const gptRes = await axios.post(
