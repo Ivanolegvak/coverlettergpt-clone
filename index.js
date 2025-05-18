@@ -1,9 +1,12 @@
+
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
+
+// ✅ CORS configuration for Netlify domain
 const corsOptions = {
   origin: "https://ai-generator-cover-letter.netlify.app",
   methods: ["GET", "POST", "OPTIONS"],
@@ -11,12 +14,23 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Handle preflight
+app.options("*", cors(corsOptions)); // Preflight handling
+
 app.use(express.json());
 
 app.post("/api/generate", async (req, res) => {
   const { resume, job } = req.body;
-  const prompt = `Write a professional cover letter using this resume:\n${resume}\n\nand this job description:\n${job}`;
+  const prompt = `
+Act as a world-class cover letter expert. Write a professional, compelling, and personalized cover letter that follows international standards. 
+Use the resume and job description provided. Analyze keywords, company mission, and values. 
+Show alignment between the candidate and the role. Be specific, concise, and inspiring.
+
+Resume:
+${resume}
+
+Job Description:
+${job}
+`;
 
   try {
     const gptRes = await axios.post(
@@ -39,4 +53,4 @@ app.post("/api/generate", async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || 3000, () => console.log("Server running"));
+app.listen(process.env.PORT || 3000, () => console.log("✅ Server running on port 3000"));
