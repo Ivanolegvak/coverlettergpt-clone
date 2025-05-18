@@ -1,4 +1,3 @@
-
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
@@ -6,16 +5,28 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ Final CORS configuration for Netlify
-const corsOptions = {
-  origin: "https://ai-generator-cover-letter.netlify.app",
+// ✅ Log all incoming requests (debugging)
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.url}`);
+  next();
+});
+
+// ✅ Strict CORS setup with dynamic preflight response
+app.use(cors({
+  origin: (origin, callback) => {
+    console.log("Origin received:", origin);
+    const allowedOrigin = "https://ai-generator-cover-letter.netlify.app";
+    if (origin === allowedOrigin || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
-};
+}));
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Preflight handling
-
+app.options("*", cors()); // handle preflight
 app.use(express.json());
 
 // ✅ Debug route to verify backend is up
