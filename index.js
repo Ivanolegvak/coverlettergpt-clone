@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const app = express();
 app.use(cors({
-  origin: "https://incandescent-youtiao-a647e8.netlify.app"
+  origin: "https://ai-generator-cover-letter.netlify.app"
 }));
 app.use(express.json());
 
