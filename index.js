@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ CORS configuration for Netlify domain
+// ✅ Final CORS configuration for Netlify
 const corsOptions = {
   origin: "https://ai-generator-cover-letter.netlify.app",
   methods: ["GET", "POST", "OPTIONS"],
@@ -17,6 +17,12 @@ app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Preflight handling
 
 app.use(express.json());
+
+// ✅ Debug route to verify backend is up
+app.get("/", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.send("CoverLetterGPT backend is live.");
+});
 
 app.post("/api/generate", async (req, res) => {
   const { resume, job } = req.body;
