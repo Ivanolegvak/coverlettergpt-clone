@@ -4,9 +4,14 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors({
-  origin: "https://ai-generator-cover-letter.netlify.app"
-}));
+const corsOptions = {
+  origin: "https://ai-generator-cover-letter.netlify.app",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight
 app.use(express.json());
 
 app.post("/api/generate", async (req, res) => {
