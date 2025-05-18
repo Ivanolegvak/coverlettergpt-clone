@@ -4,7 +4,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://incandescent-youtiao-a647e8.netlify.app"
+}));
 app.use(express.json());
 
 app.post("/api/generate", async (req, res) => {
