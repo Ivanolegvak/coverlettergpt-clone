@@ -5,35 +5,55 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ Log all incoming requests (debugging)
+// Debug middleware to log all request details
 app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`);
+  console.log('=== Request Details ===');
+  console.log(`Method: ${req.method}`);
+  console.log(`URL: ${req.url}`);
+  console.log('Headers:', req.headers);
   console.log('Origin:', req.headers.origin);
+  console.log('=====================');
   next();
 });
 
-// Basic CORS setup
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://ai-generator-cover-letter.netlify.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    console.log('Checking origin:', origin);
+    const allowedOrigins = ['https://ai-generator-cover-letter.netlify.app'];
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Origin not allowed:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: false,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle OPTIONS requests explicitly
+app.options('*', (req, res) => {
+  console.log('Handling OPTIONS request');
+  res.status(204).end();
 });
 
 app.use(express.json());
 
-// ✅ Debug route to verify backend is up
+// Debug route
 app.get("/", (req, res) => {
+  console.log('Root route accessed');
   res.send("CoverLetterGPT backend is live.");
 });
 
 app.post("/api/generate", async (req, res) => {
+  console.log('Generate endpoint accessed');
   const { resume, job } = req.body;
   const prompt = `
 Act as a world-class cover letter expert. Write a professional, compelling, and personalized cover letter that follows international standards. 
