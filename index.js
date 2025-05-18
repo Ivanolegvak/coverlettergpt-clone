@@ -13,25 +13,16 @@ app.use((req, res, next) => {
 
 // ✅ Strict CORS setup with dynamic preflight response
 app.use(cors({
-  origin: (origin, callback) => {
-    console.log("Origin received:", origin);
-    const allowedOrigin = "https://ai-generator-cover-letter.netlify.app";
-    if (origin === allowedOrigin || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  origin: "https://ai-generator-cover-letter.netlify.app",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type"],
+  credentials: true
 }));
 
-app.options("*", cors()); // handle preflight
 app.use(express.json());
 
 // ✅ Debug route to verify backend is up
 app.get("/", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
   res.send("CoverLetterGPT backend is live.");
 });
 
@@ -71,3 +62,4 @@ ${job}
 });
 
 app.listen(process.env.PORT || 3000, () => console.log("✅ Server running on port 3000"));
+
